@@ -308,16 +308,18 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
 
         final bottomChartPadding =
             getExtraNeededVerticalSpace(holder) - getTopOffsetDrawSize(holder);
-        final to = Offset(
-          getPixelX(annotation.x2, chartUsableSize, holder),
-          viewSize.height - bottomChartPadding,
-        );
+        try {
+          final to = Offset(
+            getPixelX(annotation.x2, chartUsableSize, holder),
+            viewSize.height - bottomChartPadding,
+          );
 
-        final rect = Rect.fromPoints(from, to);
+          final rect = Rect.fromPoints(from, to);
 
-        _rangeAnnotationPaint.color = annotation.color;
+          _rangeAnnotationPaint.color = annotation.color;
 
-        canvasWrapper.drawRect(rect, _rangeAnnotationPaint);
+          canvasWrapper.drawRect(rect, _rangeAnnotationPaint);
+        } catch (_) {}
       }
     }
 
@@ -328,16 +330,18 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
 
         final rightChartPadding =
             getExtraNeededHorizontalSpace(holder) - getLeftOffsetDrawSize(holder);
-        final to = Offset(
-          viewSize.width - rightChartPadding,
-          getPixelY(annotation.y2, chartUsableSize, holder),
-        );
+        try {
+          final to = Offset(
+            viewSize.width - rightChartPadding,
+            getPixelY(annotation.y2, chartUsableSize, holder),
+          );
 
-        final rect = Rect.fromPoints(from, to);
+          final rect = Rect.fromPoints(from, to);
 
-        _rangeAnnotationPaint.color = annotation.color;
+          _rangeAnnotationPaint.color = annotation.color;
 
-        canvasWrapper.drawRect(rect, _rangeAnnotationPaint);
+          canvasWrapper.drawRect(rect, _rangeAnnotationPaint);
+        } catch (_) {}
       }
     }
   }
