@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 
 const gridColor = Color(0xff68739f);
 const titleColor = Color(0xff8c95db);
@@ -11,6 +10,8 @@ const entertainmentColor = Colors.white70;
 const offRoadColor = Color(0xFFFFF59D);
 
 class RadarChartSample1 extends StatefulWidget {
+  const RadarChartSample1({Key? key}) : super(key: key);
+
   @override
   _RadarChartSample1State createState() => _RadarChartSample1State();
 }
@@ -61,10 +62,13 @@ class _RadarChartSample1State extends State<RadarChartSample1> {
                         margin: const EdgeInsets.symmetric(vertical: 2),
                         height: 26,
                         decoration: BoxDecoration(
-                          color: isSelected ? gridColor.withOpacity(0.5) : Colors.transparent,
+                          color: isSelected
+                              ? gridColor.withOpacity(0.5)
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(46),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 6),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -99,25 +103,26 @@ class _RadarChartSample1State extends State<RadarChartSample1> {
             aspectRatio: 1.3,
             child: RadarChart(
               RadarChartData(
-                radarTouchData: RadarTouchData(touchCallback: (response) {
-                  if (response.touchedSpot != null &&
-                      response.touchInput is! PointerUpEvent &&
-                      response.touchInput is! PointerExitEvent) {
-                    setState(() {
-                      selectedDataSetIndex = response.touchedSpot?.touchedDataSetIndex ?? -1;
-                    });
-                  } else {
+                radarTouchData: RadarTouchData(
+                    touchCallback: (FlTouchEvent event, response) {
+                  if (!event.isInterestedForInteractions) {
                     setState(() {
                       selectedDataSetIndex = -1;
                     });
+                    return;
                   }
+                  setState(() {
+                    selectedDataSetIndex =
+                        response?.touchedSpot?.touchedDataSetIndex ?? -1;
+                  });
                 }),
                 dataSets: showingDataSets(),
                 radarBackgroundColor: Colors.transparent,
                 borderData: FlBorderData(show: false),
                 radarBorderData: const BorderSide(color: Colors.transparent),
                 titlePositionPercentageOffset: 0.2,
-                titleTextStyle: const TextStyle(color: titleColor, fontSize: 14),
+                titleTextStyle:
+                    const TextStyle(color: titleColor, fontSize: 14),
                 getTitle: (index) {
                   switch (index) {
                     case 0:
@@ -131,7 +136,8 @@ class _RadarChartSample1State extends State<RadarChartSample1> {
                   }
                 },
                 tickCount: 1,
-                ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
+                ticksTextStyle:
+                    const TextStyle(color: Colors.transparent, fontSize: 10),
                 tickBorderData: const BorderSide(color: Colors.transparent),
                 gridBorderData: const BorderSide(color: gridColor, width: 2),
               ),
@@ -155,11 +161,14 @@ class _RadarChartSample1State extends State<RadarChartSample1> {
               : false;
 
       return RadarDataSet(
-        fillColor:
-            isSelected ? rawDataSet.color.withOpacity(0.4) : rawDataSet.color.withOpacity(0.25),
-        borderColor: isSelected ? rawDataSet.color : rawDataSet.color.withOpacity(0.25),
+        fillColor: isSelected
+            ? rawDataSet.color.withOpacity(0.2)
+            : rawDataSet.color.withOpacity(0.05),
+        borderColor:
+            isSelected ? rawDataSet.color : rawDataSet.color.withOpacity(0.25),
         entryRadius: isSelected ? 3 : 2,
-        dataEntries: rawDataSet.values.map((e) => RadarEntry(value: e)).toList(),
+        dataEntries:
+            rawDataSet.values.map((e) => RadarEntry(value: e)).toList(),
         borderWidth: isSelected ? 2.3 : 2,
       );
     }).toList();

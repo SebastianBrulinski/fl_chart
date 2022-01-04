@@ -40,6 +40,7 @@ When you change the chart's state, it animates to the new state internally (usin
 |showTitle| determines to show or hide the titles on each section|true|
 |titleStyle| TextStyle of the titles| TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)|
 |title| title of the section| value|
+|borderSide| Defines border stroke around the section | BorderSide(width: 0)|
 |badgeWidget| badge component of the section| null|
 |titlePositionPercentageOffset|the place of the title in the section, this field should be between 0 and 1|0.5|
 |badgePositionPercentageOffset|the place of the badge component in the section, this field should be between 0 and 1|0.5|
@@ -49,14 +50,13 @@ When you change the chart's state, it animates to the new state internally (usin
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |enabled|determines to enable or disable touch behaviors|true|
-|touchCallback| listen to this callback to retrieve touch events, it gives you a [PieTouchResponse](#PieTouchResponse)| null|
+|mouseCursorResolver|you can change the mouse cursor based on the provided [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [PieTouchResponse](#PieTouchResponse)|MouseCursor.defer|
+|touchCallback| listen to this callback to retrieve touch/pointer events and responses, it gives you a [FlTouchEvent](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/base_chart.md#fltouchevent) and [PieTouchResponse](#PieTouchResponse)| null|
 
 ### PieTouchResponse
 |PropName|Description|default value|
 |:-------|:----------|:------------|
 |touchedSection|Instance of [PieTouchedSection](#PieTouchedSection) which holds data about the touched section|null|
-|touchInput|a [PointerEvent](https://api.flutter.dev/flutter/gestures/PointerEvent-class.html) that is the touch behaviour|null|
-|clickHappened|If we detect a click event, this property is tru|false|
 
 ### PieTouchedSection
 |PropName|Description|default value|

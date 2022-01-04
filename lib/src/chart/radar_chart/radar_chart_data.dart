@@ -44,7 +44,7 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   final GetTitleByIndexFunction? getTitle;
 
   /// Defines style of showing [RadarChart] titles.
-  final TextStyle titleTextStyle;
+  final TextStyle? titleTextStyle;
 
   /// the [titlePositionPercentageOffset] is the place of showing title on the [RadarChart]
   /// The higher the value of this field, the more titles move away from the chart.
@@ -59,7 +59,7 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   final int tickCount;
 
   /// Defines style of showing [RadarChart] tick titles.
-  final TextStyle ticksTextStyle;
+  final TextStyle? ticksTextStyle;
 
   /// Defines style of showing [RadarChart] tick borders.
   final BorderSide tickBorderData;
@@ -129,24 +129,31 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     RadarTouchData? radarTouchData,
     FlBorderData? borderData,
   })  : assert(dataSets != null && dataSets.hasEqualDataEntriesLength),
-        assert(tickCount == null || tickCount >= 1, "RadarChart need's at least 1 tick"),
+        assert(tickCount == null || tickCount >= 1,
+            "RadarChart need's at least 1 tick"),
         assert(
           titlePositionPercentageOffset == null ||
-              titlePositionPercentageOffset >= 0 && titlePositionPercentageOffset <= 1,
+              titlePositionPercentageOffset >= 0 &&
+                  titlePositionPercentageOffset <= 1,
           'titlePositionPercentageOffset must be something between 0 and 1 ',
         ),
         dataSets = dataSets ?? const [],
         radarBackgroundColor = radarBackgroundColor ?? Colors.transparent,
-        radarBorderData = radarBorderData ?? const BorderSide(color: Colors.black, width: 2),
+        radarBorderData =
+            radarBorderData ?? const BorderSide(color: Colors.black, width: 2),
         radarTouchData = radarTouchData ?? RadarTouchData(),
         getTitle = getTitle,
-        titleTextStyle = titleTextStyle ?? const TextStyle(color: Colors.black, fontSize: 12),
+        titleTextStyle = titleTextStyle,
         titlePositionPercentageOffset = titlePositionPercentageOffset ?? 0.2,
         tickCount = tickCount ?? 1,
-        ticksTextStyle = ticksTextStyle ?? const TextStyle(fontSize: 10, color: Colors.black),
-        tickBorderData = tickBorderData ?? const BorderSide(color: Colors.black, width: 2),
-        gridBorderData = gridBorderData ?? const BorderSide(color: Colors.black, width: 2),
-        super(borderData: borderData, touchData: radarTouchData ?? RadarTouchData());
+        ticksTextStyle = ticksTextStyle,
+        tickBorderData =
+            tickBorderData ?? const BorderSide(color: Colors.black, width: 2),
+        gridBorderData =
+            gridBorderData ?? const BorderSide(color: Colors.black, width: 2),
+        super(
+            borderData: borderData,
+            touchData: radarTouchData ?? RadarTouchData());
 
   /// Copies current [RadarChartData] to a new [RadarChartData],
   /// and replaces provided values.
@@ -186,7 +193,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     if (a is RadarChartData && b is RadarChartData) {
       return RadarChartData(
         dataSets: lerpRadarDataSetList(a.dataSets, b.dataSets, t),
-        radarBackgroundColor: Color.lerp(a.radarBackgroundColor, b.radarBackgroundColor, t),
+        radarBackgroundColor:
+            Color.lerp(a.radarBackgroundColor, b.radarBackgroundColor, t),
         getTitle: b.getTitle,
         titleTextStyle: TextStyle.lerp(a.titleTextStyle, b.titleTextStyle, t),
         titlePositionPercentageOffset: lerpDouble(
@@ -197,7 +205,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         tickCount: lerpInt(a.tickCount, b.tickCount, t),
         ticksTextStyle: TextStyle.lerp(a.ticksTextStyle, b.ticksTextStyle, t),
         gridBorderData: BorderSide.lerp(a.gridBorderData, b.gridBorderData, t),
-        radarBorderData: BorderSide.lerp(a.radarBorderData, b.radarBorderData, t),
+        radarBorderData:
+            BorderSide.lerp(a.radarBorderData, b.radarBorderData, t),
         tickBorderData: BorderSide.lerp(a.tickBorderData, b.tickBorderData, t),
         borderData: FlBorderData.lerp(a.borderData, b.borderData, t),
         radarTouchData: b.radarTouchData,
@@ -254,15 +263,19 @@ class RadarDataSet with EquatableMixin {
   ///
   /// the [RadarDataSet] can have custom border. for changing border of [RadarDataSet]
   /// you can modify the [borderColor] and [borderWidth].
-  const RadarDataSet({
+  RadarDataSet({
     List<RadarEntry>? dataEntries,
     Color? fillColor,
     Color? borderColor,
     double? borderWidth,
     double? entryRadius,
-  })  : dataEntries = dataEntries ?? const [],
-        fillColor = fillColor ?? Colors.black12,
-        borderColor = borderColor ?? Colors.blueAccent,
+  })  : assert(
+          dataEntries == null || dataEntries.isEmpty || dataEntries.length >= 3,
+          'Radar needs at least 3 RadarEntry',
+        ),
+        dataEntries = dataEntries ?? const [],
+        fillColor = fillColor ?? Colors.cyan.withOpacity(0.2),
+        borderColor = borderColor ?? Colors.cyan,
         borderWidth = borderWidth ?? 2.0,
         entryRadius = entryRadius ?? 5.0;
 
@@ -314,7 +327,8 @@ class RadarEntry with EquatableMixin {
   const RadarEntry({required double value}) : value = value;
 
   /// Lerps a [RadarEntry] based on [t] value, check [Tween.lerp].
-  RadarEntry copyWith({double? value}) => RadarEntry(value: value ?? this.value);
+  RadarEntry copyWith({double? value}) =>
+      RadarEntry(value: value ?? this.value);
 
   /// Lerps a [RadarDataSet] based on [t] value, check [Tween.lerp].
   static RadarEntry lerp(RadarEntry a, RadarEntry b, double t) {
@@ -331,37 +345,37 @@ class RadarEntry with EquatableMixin {
 /// There is a touch flow, explained [here](https://github.com/imaNNeoFighT/fl_chart/blob/master/repo_files/documentations/handle_touches.md)
 /// in a simple way, each chart's renderer captures the touch events, and passes the pointerEvent
 /// to the painter, and gets touched spot, and wraps it into a concrete [RadarTouchResponse].
-class RadarTouchData extends FlTouchData with EquatableMixin {
-  /// you can implement it to receive touches callback
-  final Function(RadarTouchResponse)? touchCallback;
-
+class RadarTouchData extends FlTouchData<RadarTouchResponse>
+    with EquatableMixin {
   /// we find the nearest spots on touched position based on this threshold
   final double touchSpotThreshold;
 
   /// You can disable or enable the touch system using [enabled] flag,
   ///
-  /// You can listen to touch events using [touchCallback],
-  /// It gives you a [RadarTouchResponse] that contains some
-  /// useful information about happened touch.
+  /// [touchCallback] notifies you about the happened touch/pointer events.
+  /// It gives you a [FlTouchEvent] which is the happened event such as [FlPointerHoverEvent], [FlTapUpEvent], ...
+  /// It also gives you a [RadarTouchResponse] which contains information
+  /// about the elements that has touched.
+  ///
+  /// Using [mouseCursorResolver] you can change the mouse cursor
+  /// based on the provided [FlTouchEvent] and [RadarTouchResponse]
   RadarTouchData({
     bool? enabled,
-    Function(RadarTouchResponse)? touchCallback,
+    BaseTouchCallback<RadarTouchResponse>? touchCallback,
+    MouseCursorResolver<RadarTouchResponse>? mouseCursorResolver,
     double? touchSpotThreshold,
-  })  : touchCallback = touchCallback,
-        touchSpotThreshold = touchSpotThreshold ?? 10,
-        super(enabled ?? true);
+  })  : touchSpotThreshold = touchSpotThreshold ?? 10,
+        super(enabled ?? true, touchCallback, mouseCursorResolver);
 
   /// Used for equality check, see [EquatableMixin].
   @override
   List<Object?> get props => [
         enabled,
-        touchSpotThreshold,
         touchCallback,
+        mouseCursorResolver,
+        touchSpotThreshold,
       ];
 }
-
-/// [RadarChart]'s touch callback.
-typedef RadarTouchCallback = void Function(RadarTouchResponse);
 
 /// Holds information about touch response in the [RadarTouchResponse].
 ///
@@ -373,26 +387,17 @@ class RadarTouchResponse extends BaseTouchResponse {
 
   /// If touch happens, [RadarChart] processes it internally and passes out a [RadarTouchResponse]
   /// that contains a [touchedSpot], it gives you information about the touched spot.
-  /// [touchInput] is the type of happened touch.
-  /// [clickHappened] will be true, if we detect a click event.
-  RadarTouchResponse(
-    RadarTouchedSpot? touchedSpot,
-    PointerEvent touchInput,
-    bool clickHappened,
-  )   : touchedSpot = touchedSpot,
-        super(touchInput, clickHappened);
+  RadarTouchResponse(RadarTouchedSpot? touchedSpot)
+      : touchedSpot = touchedSpot,
+        super();
 
   /// Copies current [RadarTouchResponse] to a new [RadarTouchResponse],
   /// and replaces provided values.
   RadarTouchResponse copyWith({
     RadarTouchedSpot? touchedSpot,
-    PointerEvent? touchInput,
-    bool? clickHappened,
   }) {
     return RadarTouchResponse(
       touchedSpot ?? this.touchedSpot,
-      touchInput ?? this.touchInput,
-      clickHappened ?? this.clickHappened,
     );
   }
 }

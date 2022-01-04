@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class BarChartSample4 extends StatefulWidget {
+  const BarChartSample4({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => BarChartSample4State();
 }
@@ -31,7 +33,8 @@ class BarChartSample4State extends State<BarChartSample4> {
                 show: true,
                 bottomTitles: SideTitles(
                   showTitles: true,
-                  getTextStyles: (value) => const TextStyle(color: Color(0xff939393), fontSize: 10),
+                  getTextStyles: (context, value) =>
+                      const TextStyle(color: Color(0xff939393), fontSize: 10),
                   margin: 10,
                   getTitles: (double value) {
                     switch (value.toInt()) {
@@ -52,13 +55,16 @@ class BarChartSample4State extends State<BarChartSample4> {
                 ),
                 leftTitles: SideTitles(
                   showTitles: true,
-                  getTextStyles: (value) => const TextStyle(
+                  reservedSize: 40,
+                  getTextStyles: (context, value) => const TextStyle(
                       color: Color(
                         0xff939393,
                       ),
                       fontSize: 10),
                   margin: 0,
                 ),
+                topTitles: SideTitles(showTitles: false),
+                rightTitles: SideTitles(showTitles: false),
               ),
               gridData: FlGridData(
                 show: true,

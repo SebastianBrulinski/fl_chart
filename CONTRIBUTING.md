@@ -35,6 +35,10 @@ CanvasWrapper class holds a canvas and all draw functions proxies through it.
 You should use it for drawing on the canvas, Instead of direct accessing to canvas.
 It makes draw functions testable.
 
+<img src="https://github.com/imaNNeoFighT/fl_chart/raw/master/repo_files/images/architecture/fl_chart_architecture.jpg" />
+
+(made with [draw.io](https://drive.google.com/file/d/1bj-2TqTRUh80dRKJk10drPNeA3fp3EA8/view))
+
 
 ## Checking Your Code's Quality
 
@@ -45,14 +49,17 @@ You can simply run `make checkstyle`, and if you faced any formatting problem, r
 
 ##### Run `make checkstyle` to ensure that your code is formatted correctly
 - It runs `flutter analyze` to verify that there is no any warning or error.
-- It runs `flutter format --set-exit-if-changed --dry-run --line-length 100 .` to verify that code has formatted correctly.
+- It runs `flutter format --set-exit-if-changed --dry-run .` to verify that code has formatted correctly.
 
 #### Run `make format` to reformat the code
-- It runs `flutter format --line-length 100 .` to format your code with 100 characters limit.
+- It runs `flutter format .` to format your code.
 
 
 #### Run `make runTests` to ensure that all tests are passing.
 - It runs `flutter test` under the hood.
+
+### Run `make sure` before pushing your code.
+- It runs both `make runTests` and then `make checkstyle` sequentially with a single command.
 
 ## Creating a Pull Request
 

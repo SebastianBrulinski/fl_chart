@@ -8,9 +8,11 @@ class LineChartHelper {
   /// Contains List of cached results, base on [List<LineChartBarData>]
   ///
   /// We use it to prevent redundant calculations
-  static final Map<ListWrapper<LineChartBarData>, LineChartMinMaxAxisValues> _cachedResults = {};
+  static final Map<ListWrapper<LineChartBarData>, LineChartMinMaxAxisValues>
+      _cachedResults = {};
 
-  static LineChartMinMaxAxisValues calculateMaxAxisValues(List<LineChartBarData> lineBarsData) {
+  static LineChartMinMaxAxisValues calculateMaxAxisValues(
+      List<LineChartBarData> lineBarsData) {
     if (lineBarsData.isEmpty) {
       return LineChartMinMaxAxisValues(0, 0, 0, 0);
     }
@@ -21,17 +23,19 @@ class LineChartHelper {
       return _cachedResults[listWrapper]!.copyWith(readFromCache: true);
     }
 
-    for (var i = 0; i < lineBarsData.length; i++) {
-      final lineBarChart = lineBarsData[i];
-      if (lineBarChart.spots.isEmpty) {
-        throw Exception('spots could not be null or empty');
-      }
+    final LineChartBarData lineBarData;
+    try {
+      lineBarData =
+          lineBarsData.firstWhere((element) => element.spots.isNotEmpty);
+    } catch (e) {
+      // There is no lineBarData with at least one spot
+      return LineChartMinMaxAxisValues(0, 0, 0, 0);
     }
 
-    var minX = lineBarsData[0].spots[0].x;
-    var maxX = lineBarsData[0].spots[0].x;
-    var minY = lineBarsData[0].spots[0].y;
-    var maxY = lineBarsData[0].spots[0].y;
+    var minX = lineBarData.spots[0].x;
+    var maxX = lineBarData.spots[0].x;
+    var minY = lineBarData.spots[0].y;
+    var maxY = lineBarData.spots[0].y;
 
     for (var i = 0; i < lineBarsData.length; i++) {
       final barData = lineBarsData[i];
@@ -83,7 +87,11 @@ class LineChartMinMaxAxisValues with EquatableMixin {
   List<Object?> get props => [minX, maxX, minY, maxY, readFromCache];
 
   LineChartMinMaxAxisValues copyWith(
-      {double? minX, double? maxX, double? minY, double? maxY, bool? readFromCache}) {
+      {double? minX,
+      double? maxX,
+      double? minY,
+      double? maxY,
+      bool? readFromCache}) {
     return LineChartMinMaxAxisValues(
       minX ?? this.minX,
       maxX ?? this.maxX,
@@ -103,11 +111,15 @@ extension LineChartDataExtension on LineChartBarData {
   List<double> getSafeColorStops() {
     var stops = <double>[];
     if (colorStops == null || colorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = colorStops!;
     }
@@ -123,12 +135,17 @@ extension BarAreaDataExtension on BarAreaData {
   /// Otherwise we calculate it using colors list
   List<double> getSafeColorStops() {
     var stops = <double>[];
-    if (gradientColorStops == null || gradientColorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+    if (gradientColorStops == null ||
+        gradientColorStops!.length != colors.length) {
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = gradientColorStops!;
     }
@@ -144,12 +161,17 @@ extension BetweenBarsDataExtension on BetweenBarsData {
   /// Otherwise we calculate it using colors list
   List<double> getSafeColorStops() {
     var stops = <double>[];
-    if (gradientColorStops == null || gradientColorStops!.length != colors.length) {
-      /// provided colorStops is invalid and we calculate it here
-      colors.asMap().forEach((index, color) {
-        final percent = 1.0 / colors.length;
-        stops.add(percent * index);
-      });
+    if (gradientColorStops == null ||
+        gradientColorStops!.length != colors.length) {
+      if (colors.length > 1) {
+        /// provided colorStops is invalid and we calculate it here
+        colors.asMap().forEach((index, color) {
+          final percent = 1.0 / (colors.length - 1);
+          stops.add(percent * index);
+        });
+      } else {
+        throw ArgumentError('"colors" must have length > 1.');
+      }
     } else {
       stops = gradientColorStops!;
     }

@@ -7,6 +7,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LineChartSample8 extends StatefulWidget {
+  const LineChartSample8({Key? key}) : super(key: key);
+
   @override
   _LineChartSample8State createState() => _LineChartSample8State();
 }
@@ -47,12 +49,11 @@ class _LineChartSample8State extends State<LineChartSample8> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 1.70,
-                  child: Container(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 18.0, left: 12.0, top: 24, bottom: 12),
-                      child: LineChart(
-                        mainData(imageSnapshot.data!),
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        right: 18.0, left: 12.0, top: 24, bottom: 12),
+                    child: LineChart(
+                      mainData(imageSnapshot.data!),
                     ),
                   ),
                 ),
@@ -127,31 +128,39 @@ class _LineChartSample8State extends State<LineChartSample8> {
         ],
       ),
       gridData: FlGridData(
-          show: true, drawVerticalLine: false, drawHorizontalLine: false, verticalInterval: 1),
+          show: true,
+          drawVerticalLine: false,
+          drawHorizontalLine: false,
+          verticalInterval: 1),
       titlesData: FlTitlesData(
         show: true,
         bottomTitles: SideTitles(
           showTitles: true,
           reservedSize: 22,
-          getTextStyles: (value) => const TextStyle(color: Colors.black87, fontSize: 10),
+          getTextStyles: (context, value) =>
+              const TextStyle(color: Colors.black87, fontSize: 10),
           interval: 4,
           margin: 8,
-          checkToShowTitle: (minValue, maxValue, sideTitles, appliedInterval, value) => true,
+          checkToShowTitle:
+              (minValue, maxValue, sideTitles, appliedInterval, value) => true,
         ),
         leftTitles: SideTitles(
           interval: 2,
           showTitles: true,
-          getTextStyles: (value) => const TextStyle(
+          getTextStyles: (context, value) => const TextStyle(
             color: Colors.black87,
             fontSize: 10,
           ),
           reservedSize: 28,
           margin: 12,
         ),
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
       ),
       lineTouchData: LineTouchData(
         getTouchLineEnd: (data, index) => double.infinity,
-        getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+        getTouchedSpotIndicator:
+            (LineChartBarData barData, List<int> spotIndexes) {
           return spotIndexes.map((spotIndex) {
             return TouchedSpotIndicatorData(
               FlLine(color: Colors.orange, strokeWidth: 3),
@@ -165,15 +174,16 @@ class _LineChartSample8State extends State<LineChartSample8> {
           tooltipBgColor: Colors.blueAccent,
         ),
       ),
-      borderData:
-          FlBorderData(show: true, border: Border.all(color: const Color(0xffecf1fe), width: 1)),
+      borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: const Color(0xffecf1fe), width: 1)),
       minX: 0,
       maxX: 11,
       minY: 0,
       maxY: 6,
       lineBarsData: [
         LineChartBarData(
-          spots: [
+          spots: const [
             FlSpot(0, 1),
             FlSpot(2, 1),
             FlSpot(4.9, 5),
@@ -195,7 +205,8 @@ class _LineChartSample8State extends State<LineChartSample8> {
           ),
           belowBarData: BarAreaData(
             show: false,
-            colors: gradientColors.map((color) => color.withOpacity(0.5)).toList(),
+            colors:
+                gradientColors.map((color) => color.withOpacity(0.5)).toList(),
           ),
         ),
       ],

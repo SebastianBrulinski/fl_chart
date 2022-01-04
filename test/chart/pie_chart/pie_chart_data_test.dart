@@ -12,13 +12,15 @@ void main() {
       expect(
           pieChartData1 ==
               pieChartData1Clone.copyWith(
-                  borderData: FlBorderData(show: false, border: Border.all(color: Colors.black))),
+                  borderData: FlBorderData(
+                      show: false, border: Border.all(color: Colors.black))),
           true);
 
       expect(
           pieChartData1 ==
               pieChartData1Clone.copyWith(
-                  borderData: FlBorderData(show: true, border: Border.all(color: Colors.black))),
+                  borderData: FlBorderData(
+                      show: true, border: Border.all(color: Colors.black))),
           false);
 
       expect(
@@ -31,7 +33,8 @@ void main() {
       expect(
           pieChartData1 ==
               PieChartData(
-                borderData: FlBorderData(show: false, border: Border.all(color: Colors.black)),
+                borderData: FlBorderData(
+                    show: false, border: Border.all(color: Colors.black)),
                 startDegreeOffset: 0,
                 sections: null,
                 centerSpaceColor: Colors.white,
@@ -65,7 +68,8 @@ void main() {
               pieChartData1Clone.copyWith(
                 sections: [
                   PieChartSectionData(value: 12, color: Colors.red),
-                  PieChartSectionData(value: 22, color: Colors.green.withOpacity(0.99)),
+                  PieChartSectionData(
+                      value: 22, color: Colors.green.withOpacity(0.99)),
                 ],
               ),
           false);
@@ -111,7 +115,7 @@ void main() {
 
     test('PieTouchData equality test', () {
       final PieTouchData sample1 = PieTouchData(
-        touchCallback: (response) {},
+        touchCallback: (event, response) {},
         enabled: true,
       );
       final PieTouchData sample2 = PieTouchData(
@@ -119,7 +123,7 @@ void main() {
         enabled: true,
       );
 
-      expect(sample1 == sample2, true);
+      expect(sample1 == sample2, false);
 
       final PieTouchData disabled = PieTouchData(
         touchCallback: null,

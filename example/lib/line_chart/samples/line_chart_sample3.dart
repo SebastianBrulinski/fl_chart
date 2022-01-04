@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
 class LineChartSample3 extends StatefulWidget {
-  final weekDays = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  final weekDays = const ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-  final List<double> yValues = [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
+  final List<double> yValues = const [1.3, 1, 1.8, 1.5, 2.2, 1.8, 3];
+
+  const LineChartSample3({Key? key}) : super(key: key);
 
   @override
   State createState() => _LineChartSample3State();
@@ -31,15 +33,24 @@ class _LineChartSample3State extends State<LineChartSample3> {
           children: const <Widget>[
             Text(
               'Average Line',
-              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
             Text(
               ' and ',
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
             Text(
               'Indicators',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
             ),
           ],
         ),
@@ -52,7 +63,8 @@ class _LineChartSample3State extends State<LineChartSample3> {
           child: LineChart(
             LineChartData(
               lineTouchData: LineTouchData(
-                  getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+                  getTouchedSpotIndicator:
+                      (LineChartBarData barData, List<int> spotIndexes) {
                     return spotIndexes.map((spotIndex) {
                       final spot = barData.spots[spotIndex];
                       if (spot.x == 0 || spot.x == 6) {
@@ -104,14 +116,14 @@ class _LineChartSample3State extends State<LineChartSample3> {
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: ' k ',
                                 style: TextStyle(
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: 'calories',
                                 style: TextStyle(
                                   fontWeight: FontWeight.normal,
@@ -121,28 +133,28 @@ class _LineChartSample3State extends State<LineChartSample3> {
                           );
                         }).toList();
                       }),
-                  touchCallback: (LineTouchResponse lineTouch) {
-                    final desiredTouch = lineTouch.touchInput is! PointerExitEvent &&
-                        lineTouch.touchInput is! PointerUpEvent;
-
-                    if (desiredTouch && lineTouch.lineBarSpots != null) {
-                      final value = lineTouch.lineBarSpots![0].x;
-
-                      if (value == 0 || value == 6) {
-                        setState(() {
-                          touchedValue = -1;
-                        });
-                        return null;
-                      }
-
-                      setState(() {
-                        touchedValue = value;
-                      });
-                    } else {
+                  touchCallback:
+                      (FlTouchEvent event, LineTouchResponse? lineTouch) {
+                    if (!event.isInterestedForInteractions ||
+                        lineTouch == null ||
+                        lineTouch.lineBarSpots == null) {
                       setState(() {
                         touchedValue = -1;
                       });
+                      return;
                     }
+                    final value = lineTouch.lineBarSpots![0].x;
+
+                    if (value == 0 || value == 6) {
+                      setState(() {
+                        touchedValue = -1;
+                      });
+                      return;
+                    }
+
+                    setState(() {
+                      touchedValue = value;
+                    });
                   }),
               extraLinesData: ExtraLinesData(horizontalLines: [
                 HorizontalLine(
@@ -244,9 +256,11 @@ class _LineChartSample3State extends State<LineChartSample3> {
               ),
               titlesData: FlTitlesData(
                 show: true,
+                topTitles: SideTitles(showTitles: false),
+                rightTitles: SideTitles(showTitles: false),
                 leftTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 30,
+                  reservedSize: 40,
                   getTitles: (value) {
                     switch (value.toInt()) {
                       case 0:
@@ -261,17 +275,21 @@ class _LineChartSample3State extends State<LineChartSample3> {
 
                     return '';
                   },
-                  getTextStyles: (value) => const TextStyle(color: Colors.black, fontSize: 10),
+                  getTextStyles: (context, value) =>
+                      const TextStyle(color: Colors.black, fontSize: 10),
                 ),
                 bottomTitles: SideTitles(
                   showTitles: true,
+                  reservedSize: 40,
                   getTitles: (value) {
                     return widget.weekDays[value.toInt()];
                   },
-                  getTextStyles: (value) {
+                  getTextStyles: (context, value) {
                     final isTouched = value == touchedValue;
                     return TextStyle(
-                      color: isTouched ? Colors.deepOrange : Colors.deepOrange.withOpacity(0.5),
+                      color: isTouched
+                          ? Colors.deepOrange
+                          : Colors.deepOrange.withOpacity(0.5),
                       fontWeight: FontWeight.bold,
                     );
                   },

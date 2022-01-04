@@ -33,11 +33,12 @@ double translateRotatedPosition(double size, double degree) {
 }
 
 Offset calculateRotationOffset(Size size, double degree) {
-  final rotatedHeight =
-      (size.width * math.sin(radians(degree))).abs() + (size.height * cos(radians(degree))).abs();
-  final rotatedWidth =
-      (size.width * cos(radians(degree))).abs() + (size.height * sin(radians(degree))).abs();
-  return Offset((size.width - rotatedWidth) / 2, (size.height - rotatedHeight) / 2);
+  final rotatedHeight = (size.width * math.sin(radians(degree))).abs() +
+      (size.height * cos(radians(degree))).abs();
+  final rotatedWidth = (size.width * cos(radians(degree))).abs() +
+      (size.height * sin(radians(degree))).abs();
+  return Offset(
+      (size.width - rotatedWidth) / 2, (size.height - rotatedHeight) / 2);
 }
 
 /// Decreases [borderRadius] to <= width / 2
@@ -47,28 +48,32 @@ BorderRadius? normalizeBorderRadius(BorderRadius? borderRadius, double width) {
   }
 
   Radius topLeft;
-  if (borderRadius.topLeft.x > width / 2 || borderRadius.topLeft.y > width / 2) {
+  if (borderRadius.topLeft.x > width / 2 ||
+      borderRadius.topLeft.y > width / 2) {
     topLeft = Radius.circular(width / 2);
   } else {
     topLeft = borderRadius.topLeft;
   }
 
   Radius topRight;
-  if (borderRadius.topRight.x > width / 2 || borderRadius.topRight.y > width / 2) {
+  if (borderRadius.topRight.x > width / 2 ||
+      borderRadius.topRight.y > width / 2) {
     topRight = Radius.circular(width / 2);
   } else {
     topRight = borderRadius.topRight;
   }
 
   Radius bottomLeft;
-  if (borderRadius.bottomLeft.x > width / 2 || borderRadius.bottomLeft.y > width / 2) {
+  if (borderRadius.bottomLeft.x > width / 2 ||
+      borderRadius.bottomLeft.y > width / 2) {
     bottomLeft = Radius.circular(width / 2);
   } else {
     bottomLeft = borderRadius.bottomLeft;
   }
 
   Radius bottomRight;
-  if (borderRadius.bottomRight.x > width / 2 || borderRadius.bottomRight.y > width / 2) {
+  if (borderRadius.bottomRight.x > width / 2 ||
+      borderRadius.bottomRight.y > width / 2) {
     bottomRight = Radius.circular(width / 2);
   } else {
     bottomRight = borderRadius.bottomRight;
@@ -80,6 +85,25 @@ BorderRadius? normalizeBorderRadius(BorderRadius? borderRadius, double width) {
     bottomLeft: bottomLeft,
     bottomRight: bottomRight,
   );
+}
+
+/// Default value for BorderSide where borderSide value is not exists
+const BorderSide defaultBorderSide = BorderSide(width: 0);
+
+/// Decreases [borderSide] to <= width / 2
+BorderSide normalizeBorderSide(BorderSide? borderSide, double width) {
+  if (borderSide == null) {
+    return defaultBorderSide;
+  }
+
+  double borderWidth;
+  if (borderSide.width > width / 2) {
+    borderWidth = width / 2.toDouble();
+  } else {
+    borderWidth = borderSide.width;
+  }
+
+  return borderSide.copyWith(width: borderWidth);
 }
 
 /// Lerps between a [LinearGradient] colors, based on [t]
@@ -111,32 +135,64 @@ Color lerpGradient(List<Color> colors, List<double> stops, double t) {
 /// then we round that number by finding nearest number in this pattern:
 /// 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10000,...
 double getEfficientInterval(double axisViewSize, double diffInYAxis,
-    {double pixelPerInterval = 10}) {
+    {double pixelPerInterval = 40}) {
   final allowedCount = axisViewSize ~/ pixelPerInterval;
   final accurateInterval = diffInYAxis / allowedCount;
-  return _roundInterval(accurateInterval).toDouble();
+  return roundInterval(accurateInterval);
 }
 
-int _roundInterval(double input) {
-  var count = 0;
+@visibleForTesting
+double roundInterval(double input) {
+  if (input < 1) {
+    return _roundIntervalBelowOne(input);
+  }
+  return _roundIntervalAboveOne(input);
+}
 
-  if (input >= 10) {
-    count++;
+double _roundIntervalBelowOne(double input) {
+  assert(input < 1.0);
+
+  if (input < 0.000001) {
+    return input;
   }
 
-  while (input ~/ 100 != 0) {
-    input /= 10;
-    count++;
+  final inputString = input.toString();
+  int precisionCount = inputString.length - 2;
+
+  int zeroCount = 0;
+  for (int i = 2; i <= inputString.length; i++) {
+    if (inputString[i] != '0') {
+      break;
+    }
+    zeroCount++;
   }
+
+  int afterZerosNumberLength = precisionCount - zeroCount;
+  if (afterZerosNumberLength > 2) {
+    final numbersToRemove = afterZerosNumberLength - 2;
+    precisionCount -= numbersToRemove;
+  }
+
+  final pow10onPrecision = pow(10, precisionCount);
+  input *= pow10onPrecision;
+  return _roundIntervalAboveOne(input) / pow10onPrecision;
+}
+
+double _roundIntervalAboveOne(double input) {
+  assert(input >= 1.0);
+  final decimalCount = input.toInt().toString().length - 1;
+  input /= pow(10, decimalCount);
 
   final scaled = input >= 10 ? input.round() / 10 : input;
 
-  if (scaled >= 2.6) {
-    return 5 * pow(10, count).toInt();
+  if (scaled >= 7.6) {
+    return 10 * pow(10, decimalCount).toInt().toDouble();
+  } else if (scaled >= 2.6) {
+    return 5 * pow(10, decimalCount).toInt().toDouble();
   } else if (scaled >= 1.6) {
-    return 2 * pow(10, count).toInt();
+    return 2 * pow(10, decimalCount).toInt().toDouble();
   } else {
-    return pow(10, count).toInt();
+    return 1 * pow(10, decimalCount).toInt().toDouble();
   }
 }
 
@@ -189,4 +245,19 @@ String formatNumber(double number) {
   }
 
   return resultNumber + symbol;
+}
+
+/// Returns a TextStyle based on provided [context], if [providedStyle] provided we try to merge it.
+TextStyle getThemeAwareTextStyle(
+    BuildContext context, TextStyle? providedStyle) {
+  final defaultTextStyle = DefaultTextStyle.of(context);
+  var effectiveTextStyle = providedStyle;
+  if (providedStyle == null || providedStyle.inherit) {
+    effectiveTextStyle = defaultTextStyle.style.merge(providedStyle);
+  }
+  if (MediaQuery.boldTextOverride(context)) {
+    effectiveTextStyle =
+        effectiveTextStyle!.merge(const TextStyle(fontWeight: FontWeight.bold));
+  }
+  return effectiveTextStyle ??= defaultTextStyle.style;
 }

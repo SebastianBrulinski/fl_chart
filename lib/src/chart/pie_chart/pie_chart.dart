@@ -18,9 +18,13 @@ class PieChart extends ImplicitlyAnimatedWidget {
   /// which default is [Curves.linear].
   const PieChart(
     this.data, {
+    Key? key,
     Duration swapAnimationDuration = defaultDuration,
     Curve swapAnimationCurve = Curves.linear,
-  }) : super(duration: swapAnimationDuration, curve: swapAnimationCurve);
+  }) : super(
+            key: key,
+            duration: swapAnimationDuration,
+            curve: swapAnimationCurve);
 
   /// Creates a [_PieChartState]
   @override
@@ -47,18 +51,9 @@ class _PieChartState extends AnimatedWidgetBaseState<PieChart> {
   Widget build(BuildContext context) {
     final showingData = _getData();
 
-    /// Wr wrapped our chart with [GestureDetector], and onLongPressStart callback.
-    /// because we wanted to lock the widget from being scrolled when user long presses on it.
-    /// If we found a solution for solve this issue, then we can remove this undoubtedly.
-    return GestureDetector(
-      onLongPressStart: (details) {},
-      child: PieChartLeaf(
-        data: _pieChartDataTween!.evaluate(animation),
-        targetData: showingData,
-        touchCallback: (response) {
-          showingData.pieTouchData.touchCallback?.call(response);
-        },
-      ),
+    return PieChartLeaf(
+      data: _pieChartDataTween!.evaluate(animation),
+      targetData: showingData,
     );
   }
 

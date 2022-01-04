@@ -8,11 +8,13 @@ class BarChartHelper {
   /// Contains List of cached results, base on [List<BarChartGroupData>]
   ///
   /// We use it to prevent redundant calculations
-  static final Map<ListWrapper<BarChartGroupData>, BarChartMinMaxAxisValues> _cachedResults = {};
+  static final Map<ListWrapper<BarChartGroupData>, BarChartMinMaxAxisValues>
+      _cachedResults = {};
 
   /// Calculates minY, and maxY based on [barGroups],
   /// returns cached values, to prevent redundant calculations.
-  static BarChartMinMaxAxisValues calculateMaxAxisValues(List<BarChartGroupData> barGroups) {
+  static BarChartMinMaxAxisValues calculateMaxAxisValues(
+      List<BarChartGroupData> barGroups) {
     if (barGroups.isEmpty) {
       return BarChartMinMaxAxisValues(0, 0);
     }
@@ -22,14 +24,16 @@ class BarChartHelper {
     if (_cachedResults.containsKey(listWrapper)) {
       return _cachedResults[listWrapper]!.copyWith(readFromCache: true);
     }
-    for (var i = 0; i < barGroups.length; i++) {
-      final barData = barGroups[i];
-      if (barData.barRods.isEmpty) {
-        throw Exception('barRods could not be null or empty');
-      }
+
+    final BarChartGroupData barGroup;
+    try {
+      barGroup = barGroups.firstWhere((element) => element.barRods.isNotEmpty);
+    } catch (e) {
+      // There is no barChartGroupData with at least one barRod
+      return BarChartMinMaxAxisValues(0, 0);
     }
 
-    var maxY = barGroups[0].barRods[0].y;
+    var maxY = barGroup.barRods[0].y;
     var minY = 0.0;
 
     for (var i = 0; i < barGroups.length; i++) {
@@ -72,7 +76,8 @@ class BarChartMinMaxAxisValues with EquatableMixin {
   @override
   List<Object?> get props => [minY, maxY, readFromCache];
 
-  BarChartMinMaxAxisValues copyWith({double? minY, double? maxY, bool? readFromCache}) {
+  BarChartMinMaxAxisValues copyWith(
+      {double? minY, double? maxY, bool? readFromCache}) {
     return BarChartMinMaxAxisValues(
       minY ?? this.minY,
       maxY ?? this.maxY,
